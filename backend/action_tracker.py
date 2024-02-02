@@ -9,7 +9,7 @@ app = Flask(__name__)
 actions = []
 
 DIRECTORY = "/Users/andreslaurito/repos/babies_action_tracker/backend"
-ACTIONS = ["sleep", "eat", "poop", "diaper_change"]
+ACTIONS = ("sleep", "eat", "poop", "diaper_change")
 
 # create a logger
 logger = logging.getLogger()
@@ -57,15 +57,6 @@ def get_actions():
 def append_to_file(filename, text):
     with open(filename, "a") as file:
         file.write(text)
-
-
-def get_action_from(input_text):
-    for action in ACTIONS:
-        if action in input_text:
-            return action
-
-    # if we are here no action was detected, something went wrong!
-    logger.error(f"No action was found in {input_text}")
 
 
 def get_and_update_status_for(action):
