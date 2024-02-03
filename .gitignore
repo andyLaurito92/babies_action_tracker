@@ -1,1 +1,7 @@
-./mobile/buildozer/*
+__pycache__
+
+.cache
+build
+dist
+
+.buildozer
