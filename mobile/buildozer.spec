@@ -1,13 +1,16 @@
 [app]
 
 # (str) Title of your application
-title = Babies Action Tracker
+title = TrackingBabies
 
 # (str) Package name
-package.name = BabiesActionTracker 
+package.name = trackingbabies
 
 # (str) Package domain (needed for android/ios packaging)
 package.domain = org.test
+
+android.permissions = INTERNET
+p4a.branch = develop
 
 # (str) Source code where the main.py live
 source.dir = .
@@ -95,7 +98,7 @@ fullscreen = 0
 
 # (list) Permissions
 # (See https://python-for-android.readthedocs.io/en/latest/buildoptions/#build-options-1 for all the supported syntaxes and properties)
-android.permissions = android.permission.INTERNET
+#android.permissions = android.permission.INTERNET, (name=android.permission.WRITE_EXTERNAL_STORAGE;maxSdkVersion=18)
 
 # (list) features (adds uses-feature -tags to manifest)
 #android.features = android.hardware.usb.host
@@ -321,7 +324,7 @@ android.allow_backup = True
 #p4a.fork = kivy
 
 # (str) python-for-android branch to use, defaults to master
-p4a.branch = develop
+#p4a.branch = master
 
 # (str) python-for-android specific commit to use, defaults to HEAD, must be within p4a.branch
 #p4a.commit = HEAD

@@ -15,16 +15,18 @@ class BabiesActionTracker(App):
         layout = BoxLayout(orientation='vertical', spacing=10, padding=10)
 
         # Create buttons
-        sleep_button = Button(text='Sleep', on_press=lambda instance: self.call_api('http://192.168.1.32:5001/add_action', 'sleep'))
-        eat_button = Button(text='Eat', on_press=lambda instance: self.call_api('http://192.168.1.32:5001/add_action', 'eat'))
-        poop_button = Button(text='Poop', on_press=lambda instance: self.call_api('http://192.168.1.32:5001/add_action', 'poop'))
-        diaperchange_button = Button(text='Diaper Change', on_press=lambda instance: self.call_api('http://192.168.1.32:5001/add_action', 'diaper_change'))
+        sleep_button = Button(text='Sleep', on_press=lambda instance: self.call_api('http://192.168.1.32:5001/add_sleep_action', 'sleep'))
+        eat_button = Button(text='Eat', on_press=lambda instance: self.call_api('http://192.168.1.32:5001/add_eat_action', 'eat'))
+        poop_button = Button(text='Poop', on_press=lambda instance: self.call_api('http://192.168.1.32:5001/add_poop_action', 'poop'))
+        diaperchange_button = Button(text='Diaper Change', on_press=lambda instance: self.call_api('http://192.168.1.32:5001/add_diaper_change_action', 'diaper_change'))
+        bath_button = Button(text='Bath', on_press=lambda instance: self.call_api('http://192.168.1.32:5001/add_bath_action', 'bath'))
 
         # Add buttons to the layout
         layout.add_widget(sleep_button)
         layout.add_widget(eat_button)
         layout.add_widget(poop_button)
         layout.add_widget(diaperchange_button)
+        layout.add_widget(bath_button)
 
         return layout
 
@@ -36,7 +38,7 @@ class BabiesActionTracker(App):
         time_of_action = current_time.strftime("%Y-%m-%dT%H:%M:%S")
 
         # Body of the request to send
-        request_data = {'action': action, 'timestamp': time_of_action}
+        request_data = {'timestamp': time_of_action}
 
         # Make the UrlRequest with the correct Content-Type header
         headers = {'Content-Type': 'application/json'}
@@ -55,3 +57,4 @@ class BabiesActionTracker(App):
 
 if __name__ == '__main__':
     BabiesActionTracker().run()
+

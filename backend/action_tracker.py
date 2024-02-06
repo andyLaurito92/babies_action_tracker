@@ -3,16 +3,18 @@ import logging
 from datetime import datetime
 from flask import Flask, request, jsonify
 from datetime import datetime
+from action_model import ActionRepository, db, EatActionStatus, SleepActionStatus
 
 app = Flask(__name__)
-
-actions = []
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///baby_actions.db'
 
 DIRECTORY = "/Users/andreslaurito/repos/babies_action_tracker/backend"
-ACTIONS = ("sleep", "eat", "poop", "diaper_change")
+ACTIONS = ("sleep", "eat", "poop", "diaper_change", "bath")
 
 # create a logger
 logger = logging.getLogger()
+
+action_repo = ActionRepository()
 
 # Configure a handler for all messages (INFO and above) to a general log file
 file_handler_all = logging.FileHandler(f"{DIRECTORY}/logs/all_messages.log")
@@ -30,63 +32,125 @@ file_handler_error.setFormatter(error_formatter)
 logger.addHandler(file_handler_all)
 logger.addHandler(file_handler_error)
 
-@app.route('/add_action', methods=['POST'])
-def add_action():
+def is_valid_action(data):
+    if 'timestamp' not in data:
+        return False, jsonify({'error': 'Timestamp parameters is required'}), 400
+    return True, {}
+
+    
+@app.route('/add_eat_action', methods=['POST'])
+def add_eat_action():
     data = request.get_json()
 
-    if 'action' not in data or 'timestamp' not in data:
-        return jsonify({'error': 'Both action and timestamp parameters are required'}), 400
-    elif data['action'] not in ACTIONS:
-        return jsonify({'error': f"Action was {data['action']} which is not expected"}), 400
-
-    action = {
-        'action': data['action'],
-        'timestamp': data['timestamp'],
-    }
-
-    actions.append(action)
-    save_action_to_metrics_file(data['action'], data['timestamp'])
+    is_valid, message = is_valid_action(data)
+    if not is_valid:
+        return message
+    
+    #save_action_to_metrics_file(data['action'], data['timestamp'])
+    action_repo.save_eat_action(data['timestamp'])
 
     return jsonify({'message': 'Action added successfully'}), 201
 
-@app.route('/get_actions', methods=['GET'])
-def get_actions():
-    return jsonify(actions)
+@app.route('/add_sleep_action', methods=['POST'])
+def add_sleep_action():
+    logger.info("Going to save new sleep action")
+    data = request.get_json()
+
+    is_valid, message = is_valid_action(data)
+    if not is_valid:
+        logger.info("Action recieved was not valid")
+        return message
+    
+    #save_action_to_metrics_file(data['action'], data['timestamp'])
+    logger.info("Saving in db")
+    action_repo.save_sleep_action(data['timestamp'])
+    logger.info("Saved successfully")
+
+    return jsonify({'message': 'Action added successfully'}), 201
+
+@app.route('/add_poop_action', methods=['POST'])
+def add_poop_action():
+    logger.info("Going to save new poop action")
+    data = request.get_json()
+
+    is_valid, message = is_valid_action(data)
+    if not is_valid:
+        return message
+    
+    #save_action_to_metrics_file(data['timestamp'])
+    action_repo.save_poop_action(data['timestamp'])
+
+    return jsonify({'message': 'Action added successfully'}), 201
+
+@app.route('/add_diaper_change_action', methods=['POST'])
+def add_diaper_change_action():
+    data = request.get_json()
+
+    is_valid, message = is_valid_action(data)
+    if not is_valid:
+        return message
+    
+    #save_action_to_metrics_file(data['action'], data['timestamp'])
+    action_repo.save_diaper_change_action(data['timestamp'])
+
+    return jsonify({'message': 'Action added successfully'}), 201
+
+@app.route('/add_bath_action', methods=['POST'])
+def add_bath_action():
+    data = request.get_json()
+
+    is_valid, message = is_valid_action(data)
+    if not is_valid:
+        return message
+    
+    #save_action_to_metrics_file(data['action'], data['timestamp'])
+    action_repo.save_bath_action(data['timestamp'])
+
+    return jsonify({'message': 'Action added successfully'}), 201
 
 
-def append_to_file(filename, text):
-    with open(filename, "a") as file:
-        file.write(text)
+@app.route('/get_bath_actions', methods=['GET'])
+def get_bath_actions():
+    return jsonify([(bath_action.timestamp, bath_action.status) for bath_action in action_repo.get_all_bath_actions()])
 
 
-def get_and_update_status_for(action):
-    """ Naive function that negates the current status.
-    If the status was STARTED, it returns ENDED and saves the status to the file
-    corresponding to the action recieved. Otherwise it does the opposite."""
-    action_status_file = f"{DIRECTORY}/data/{action}_status.txt"
-    current_action_status = ""
-    next_action_status = ""
-    with open(action_status_file, "r") as action_status_content:
-        current_action_status = action_status_content.read()
+@app.route('/get_eat_actions', methods=['GET'])
+def get_eat_actions():
+    return jsonify([(eat_action.timestamp, eat_action.status) for eat_action in action_repo.get_all_eat_actions()])
 
-    if current_action_status == "STARTED":
-        next_action_status = "ENDED"
-    else:
-        next_action_status = "STARTED"
+@app.route('/get_eat_action_status', methods=['GET'])
+def get_eat_action_status():
+    return action_repo.get_eat_action_status().status
 
-    with open(action_status_file, "w") as action_status_content:
-        action_status_content.write(next_action_status)
+@app.route('/get_sleep_actions', methods=['GET'])
+def get_sleep_actions():
+    return jsonify([(sleep_action.timestamp, sleep_action.status) for sleep_action in action_repo.get_all_sleep_actions()])
 
-    return next_action_status
+@app.route('/get_sleep_action_status', methods=['GET'])
+def get_sleep_action_status():
+    return action_repo.get_sleep_action_status().status
 
+@app.route('/get_diaper_change_actions', methods=['GET'])
+def get_diaper_change_actions():
+    return jsonify([diaper_change_action.timestamp for diaper_change_action in action_repo.get_all_diaper_change_actions()])
 
-def save_action_to_metrics_file(action, time_of_action):
-    action_filename = f"{DIRECTORY}/data/{action}.csv"
-    status = get_and_update_status_for(action)
-    append_to_file(action_filename, f"{time_of_action}, {status} \n")
-    logger.info(f"Text has been saved to {action_filename}")
+@app.route('/get_poop_actions', methods=['GET'])
+def get_poop_actions():
+    return jsonify([poop_action.timestamp for poop_action in action_repo.get_all_poop_actions()])
 
 
 if __name__ == "__main__":
     # This allows the Flask app to accept connections from any IP address on your local network
+    logger.info("Initializing app")
+    db.init_app(app)
+    with app.app_context():
+        db.create_all()
+        logger.info("Initializing statuses of sleep & eat actions")
+        if EatActionStatus.query.count() == 0:
+            db.session.add(EatActionStatus(status='ENDED'))
+            db.session.commit()
+        if SleepActionStatus.query.count() == 0:
+            db.session.add(SleepActionStatus(status='ENDED'))
+            db.session.commit()
+        
     app.run(host='0.0.0.0', port=5001)
