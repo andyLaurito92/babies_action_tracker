@@ -24,11 +24,29 @@ def record_action():
     return jsonify({'message': 'Action recorded successfully'}), 200
 
 # API endpoint to get all recorded actions
-@app.route('/get_all_actions', methods=['GET'])
-def get_all_actions():
-    actions = baby_action_repository.get_all()
-    action_data = [{'action_type': action.action_type, 'timestamp': action.timestamp} for action in actions]
+@app.route('/get_all_actions/<action_type>', methods=['GET'])
+def get_all_actions(action_type):
+    actions = baby_action_repository.get_all(action_type)
+    action_data = [
+        {
+            'action_type': action.action_type,
+            'status': action.status,
+            'timestamp': action.timestamp,
+            'start_timestamp': action.start_timestamp,
+            'food_type': action.food_type if hasattr(action, 'food_type') else None,
+            'consistency': action.consistency if hasattr(action, 'consistency') else None,
+            'wetness': action.wetness if hasattr(action, 'wetness') else None,
+            'duration_minutes': action.duration_minutes if hasattr(action, 'duration_minutes') else None,
+        }
+        for action in actions
+    ]
     return jsonify(action_data)
 
+""" Creating Database with App Context"""
+def create_db():
+    with app.app_context():
+        db.create_all()
+
 if __name__ == '__main__':
+    create_db()
     app.run(debug=True)
