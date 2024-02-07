@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Baby Actions Buttons</title>
+</head>
+<body>
+    <button onclick="addAction('eat')">Eat</button>
+    <button onclick="addAction('poop')">Poop</button>
+    <button onclick="addAction('diaper_change')">Diaper Change</button>
+    <button onclick="addAction('bath')">Bath</button>
+    <button onclick="addAction('sleep')">Sleep</button>
+
+    <div id="popup" style="display: none;">
+        <p>Action added</p>
+    </div>
+
+    <script>
+        function addAction(action) {
+	    var tzoffset = (new Date()).getTimezoneOffset() * 60000; //offset in milliseconds
+	    var timestamp = (new Date(Date.now() - tzoffset)).toISOString().slice(0, -1);
+            fetch('http://192.168.1.32:5001/add_action', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ action: action, timestamp: timestamp})
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('Response:', data);
+                // Show popup if response is successful
+                showPopup();
+            })
+            .catch(error => {
+                console.error('There was a problem with the fetch operation:', error);
+            });
+        }
+
+        function showPopup() {
+            var popup = document.getElementById('popup');
+            popup.style.display = 'block';
+            setTimeout(function() {
+                popup.style.display = 'none';
+            }, 2000); // Hide popup after 2 seconds
+        }
+    </script>
+</body>
+</html>

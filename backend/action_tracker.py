@@ -1,7 +1,7 @@
 import sys
 import logging
 from datetime import datetime
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, render_template
 from datetime import datetime
 from action_model import ActionRepository, db, BabyAction, BabyActionStatuses
 
@@ -42,6 +42,10 @@ def is_valid_action(data):
     else:
         return True, {}
 
+
+@app.route('/')
+def index():
+    return render_template('action_buttons.html')
 
 @app.route('/add_action', methods=['POST'])
 def add_action():
