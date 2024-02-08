@@ -18,7 +18,7 @@ action_repo = ActionRepository()
 
 # Configure a handler for all messages (INFO and above) to a general log file
 file_handler_all = logging.FileHandler(f"{DIRECTORY}/logs/all_messages.log")
-file_handler_all.setLevel(logging.INFO)
+file_handler_all.setLevel(logging.DEBUG)
 file_formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
 file_handler_all.setFormatter(file_formatter)
 
@@ -32,31 +32,20 @@ file_handler_error.setFormatter(error_formatter)
 logger.addHandler(file_handler_all)
 logger.addHandler(file_handler_error)
 
-def is_valid_action(data):
-    if 'timestamp' not in data:
-        return False, jsonify({'error': 'Timestamp parameter is required'})
-    elif 'action' not in data:
-        return False, jsonify({'error': 'Action parameter is required'})
-    elif data['action'] not in ACTIONS:
-        return False, jsonify({'error': f"Action {data['action']} is not expected"})
-    else:
-        return True, {}
-
-
 @app.route('/')
 def index():
-    return render_template('action_buttons.html')
+   return render_template('action_buttons.html')
 
 @app.route('/add_action', methods=['POST'])
 def add_action():
-    data = request.get_json()
-
-    is_valid, message = is_valid_action(data)
-    if not is_valid:
-        return message, 400
-    #save_action_to_metrics_file(data['action'], data['timestamp'])
-    action_repo.save_action(data['action'], data['timestamp'])
-    return jsonify({'message': 'Action added successfully'}), 201
+    match request.get_json():
+        case {"action": val_action, "timestamp": val_timestamp}:
+            logger.info(f"Request is valid. Values {val_action} {val_timestamp}")
+            action_repo.save_action(val_action, val_timestamp)
+            return jsonify({'message': 'Action added successfully'}), 201
+        case _:
+            logger.info(f"Request is invalid")
+            return jsonify({'message': 'Request is invalid. Please provide both action and timestamp'}), 400    
 
 @app.route('/get_all_actions/<action>', methods=['GET'])
 def get_all_actions(action):
