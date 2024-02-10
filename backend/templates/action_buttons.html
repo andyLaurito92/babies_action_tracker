@@ -11,10 +11,86 @@
     <button onclick="addAction('diaper_change')">Diaper Change</button>
     <button onclick="addAction('bath')">Bath</button>
     <button onclick="addAction('sleep')">Sleep</button>
+    <button onclick="addAction('washing_diapers')">Washing Diapers</button>
+
 
     <div id="popup" style="display: none;">
         <p>Action added</p>
     </div>
+
+    <table id="actionTable">
+        <tr>
+            <th>Eat</th>
+            <th>Poop</th>
+            <th>Diaper Change</th>
+            <th>Bath</th>
+            <th>Sleep</th>
+	    <th>Washing Diapers</th>
+        </tr>
+        <tr id="timestampsRow">
+            <td id="eatTimestamp">-</td>
+            <td id="poopTimestamp">-</td>
+            <td id="diaper_changeTimestamp">-</td>
+            <td id="bathTimestamp">-</td>
+            <td id="sleepTimestamp">-</td>
+	    <td id="washing_diapersTimestamp">-</td>
+        </tr>
+    </table>
+
+    <style>
+      babyImage {
+            display: block;
+            margin: 20px auto;
+            width: 200px;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+	    background-image: url("https://raw.githubusercontent.com/andyLaurito92/babies_action_tracker/6007f1b47a35d3e2c18a49e34198f7e540e1ef1b/backend/templates/images/baby_tracking.png");
+            background-size: 50%;
+	    background-repeat: no-repeat;
+	    background-position: center;
+	    height: 100vh;
+        }
+
+        button {
+            padding: 10px;
+            margin: 5px;
+            font-size: 16px;
+        }
+
+        #popup {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #ffffff;
+            padding: 20px;
+            border: 2px solid #333333;
+            border-radius: 8px;
+            z-index: 1000;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 80%;
+            margin: 20px auto;
+        }
+
+        th, td {
+            border: 1px solid #dddddd;
+            padding: 10px;
+            text-align: center;
+        }
+
+        th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+        }
+    </style>
 
     <script>
         function addAction(action) {
@@ -37,6 +113,9 @@
                 console.log('Response:', data);
                 // Show popup if response is successful
                 showPopup();
+
+	        // Update table with latest timestamps
+                updateTimestamp(action, timestamp);
             })
             .catch(error => {
                 console.error('There was a problem with the fetch operation:', error);
@@ -50,6 +129,30 @@
                 popup.style.display = 'none';
             }, 2000); // Hide popup after 2 seconds
         }
+
+	function updateTimestamps() {
+            // Call API to get the latest timestamps for all actions
+            fetch('http://192.168.1.32:5001/get_last_timestamps')
+                .then(response => response.json())
+                .then(data => {
+                    var timestamps = data.timestamps;
+                    for (var i = 0; i < timestamps.length; i++) {
+                        var action = timestamps[i].action;
+                        var timestamp = timestamps[i].timestamp;
+                        var cell = document.getElementById(action.toLowerCase() + 'Timestamp');
+                        cell.textContent = timestamp;
+                    }
+                })
+                .catch(error => {
+                    console.error('There was a problem with the fetch operation:', error);
+                });
+        }
+
+	// Call updateTimestamps initially
+        updateTimestamps();
+
+        // Call updateTimestamps every 2 minutes
+        setInterval(updateTimestamps, 120000);
     </script>
 </body>
 </html>

@@ -9,7 +9,7 @@ app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///baby_actions.db'
 
 DIRECTORY = "/Users/andreslaurito/repos/babies_action_tracker/backend"
-ACTIONS = ("sleep", "eat", "poop", "diaper_change", "bath")
+ACTIONS = ("sleep", "eat", "poop", "diaper_change", "bath", "washing_diapers")
 
 # create a logger
 logger = logging.getLogger()
@@ -51,6 +51,10 @@ def add_action():
 def get_all_actions(action):
     res = action_repo.get_all(action)
     return jsonify([(baby_action.action_name, baby_action.timestamp, baby_action.status) for baby_action in res])
+
+@app.route('/get_last_timestamps', methods=['GET'])
+def get_last_timestamps():
+    return jsonify{'timestamps': action_repo.get_latest_timestamps(ACTIONS)}
 
 if __name__ == "__main__":
     # This allows the Flask app to accept connections from any IP address on your local network

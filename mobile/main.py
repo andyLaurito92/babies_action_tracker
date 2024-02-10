@@ -20,6 +20,8 @@ class BabiesActionTracker(App):
         poop_button = Button(text='Poop', on_press=lambda instance: self.call_api('http://192.168.1.32:5001/add_action', 'poop'))
         diaperchange_button = Button(text='Diaper Change', on_press=lambda instance: self.call_api('http://192.168.1.32:5001/add_action', 'diaper_change'))
         bath_button = Button(text='Bath', on_press=lambda instance: self.call_api('http://192.168.1.32:5001/add_action', 'bath'))
+        washing_daipers_button = Button(text='Washing Daipers', on_press=lambda instance: self.call_api('http://192.168.1.32:5001/add_action', 'washing_daipers'))
+
 
         # Add buttons to the layout
         layout.add_widget(sleep_button)
@@ -27,6 +29,8 @@ class BabiesActionTracker(App):
         layout.add_widget(poop_button)
         layout.add_widget(diaperchange_button)
         layout.add_widget(bath_button)
+        layout.add_widget(washing_diapers_button)
+
 
         return layout
 

@@ -1,4 +1,5 @@
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import text
 
 db = SQLAlchemy()
 
@@ -33,3 +34,12 @@ class ActionRepository:
 
     def get_all(self, action):
         return BabyAction.query.filter_by(action_name=action).all()
+
+    def get_last_timestamp_for(self, action_name):
+        result = db.session.query(BabyAction).from_statement(text(f"select * from baby_actions where action_name = '{action_name}' ORDER BY timestamp DESC limit 1;")).first()
+        return result.timestamp if result != None else 'No entry yet'
+
+    def get_latest_timestamps(self, actions):
+        return [{'action': action_name,
+                 'timestamp': self.get_last_timestamp_for(action_name)} for action_name in actions]
+
