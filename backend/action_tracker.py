@@ -54,7 +54,7 @@ def get_all_actions(action):
 
 @app.route('/get_last_timestamps', methods=['GET'])
 def get_last_timestamps():
-    return jsonify{'timestamps': action_repo.get_latest_timestamps(ACTIONS)}
+    return jsonify({'timestamps': action_repo.get_latest_timestamps(ACTIONS)})
 
 if __name__ == "__main__":
     # This allows the Flask app to accept connections from any IP address on your local network

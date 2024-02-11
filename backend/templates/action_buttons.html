@@ -6,36 +6,48 @@
     <title>Baby Actions Buttons</title>
 </head>
 <body>
-    <button onclick="addAction('eat')">Eat</button>
-    <button onclick="addAction('poop')">Poop</button>
-    <button onclick="addAction('diaper_change')">Diaper Change</button>
-    <button onclick="addAction('bath')">Bath</button>
-    <button onclick="addAction('sleep')">Sleep</button>
-    <button onclick="addAction('washing_diapers')">Washing Diapers</button>
+    <div class="container">
+        <button onclick="addAction('eat')">Eat</button>
+        <button onclick="addAction('poop')">Poop</button>
+        <button onclick="addAction('diaper_change')">Diaper Change</button>
+        <button onclick="addAction('bath')">Bath</button>
+        <button onclick="addAction('sleep')">Sleep</button>
+        <button onclick="addAction('washing_diapers')">Washing Diapers</button>
 
-
-    <div id="popup" style="display: none;">
-        <p>Action added</p>
+        <div id="popup" style="display: none;">
+            <p>Action added</p>
+        </div>
+        
+        <table id="actionTable">
+            <tr>
+                <th></th>
+                <th>Eat</th>
+                <th>Poop</th>
+                <th>Diaper Change</th>
+                <th>Bath</th>
+                <th>Sleep</th>
+                <th>Washing Diapers</th>
+            </tr>
+            <tr id="timestampsRow">
+                <td>Last time</td>
+                <td id="eatTimestamp">-</td>
+                <td id="poopTimestamp">-</td>
+                <td id="diaper_changeTimestamp">-</td>
+                <td id="bathTimestamp">-</td>
+                <td id="sleepTimestamp">-</td>
+                <td id="washing_diapersTimestampstamp">-</td>
+            </tr>
+            <tr id="timeSinceLastAction">
+                <td>Time elapsed since last action</td>
+                    <td id="eatElapsedTime">-</td>
+                <td id="poopElapsedTime">-</td>
+                <td id="diaper_changeElapsedTime">-</td>
+                <td id="bathElapsedTime">-</td>
+                <td id="sleepElapsedTime">-</td>
+                <td id="washing_diapersElapsedTime">-</td>
+            </tr>
+        </table>
     </div>
-
-    <table id="actionTable">
-        <tr>
-            <th>Eat</th>
-            <th>Poop</th>
-            <th>Diaper Change</th>
-            <th>Bath</th>
-            <th>Sleep</th>
-	    <th>Washing Diapers</th>
-        </tr>
-        <tr id="timestampsRow">
-            <td id="eatTimestamp">-</td>
-            <td id="poopTimestamp">-</td>
-            <td id="diaper_changeTimestamp">-</td>
-            <td id="bathTimestamp">-</td>
-            <td id="sleepTimestamp">-</td>
-	    <td id="washing_diapersTimestamp">-</td>
-        </tr>
-    </table>
 
     <style>
       babyImage {
@@ -90,6 +102,18 @@
             background-color: #f2f2f2;
             font-weight: bold;
         }
+
+        /* Add background color to table cells */
+        .actionTable td {
+            background-color: rgba(255, 255, 255, 0.7); /* Semi-transparent white */
+        }
+
+        /* Style for the container div */
+        .container {
+            padding: 20px;
+            background-color: rgba(255, 255, 255, 0.8); /* Semi-transparent white */
+        }
+
     </style>
 
     <script>
@@ -130,6 +154,29 @@
             }, 2000); // Hide popup after 2 seconds
         }
 
+	// Object to store the timestamp of the last action for each action type
+      var lastActionTimestamps = {
+      };
+
+      // Function to update the elapsed time since the last action for each action type
+      function updateElapsedTimes() {
+        var now = new Date().getTime();
+        for (var action in lastActionTimestamps) {
+            var elapsedTime = now - lastActionTimestamps[action];
+        
+            // Calculate hours and minutes
+            var hours = Math.floor(elapsedTime / (1000 * 60 * 60));
+            var minutes = Math.floor((elapsedTime % (1000 * 60 * 60)) / (1000 * 60));
+        
+            // Format hours and minutes
+            var formattedTime = ("0" + hours).slice(-2) + "hs:" + ("0" + minutes).slice(-2) + "m";
+        
+            // Update the elapsed time cell for the current action
+            var elapsedTimeCell = document.getElementById(action.toLowerCase() + 'ElapsedTime');
+            elapsedTimeCell.textContent = formattedTime;
+        }
+      }
+
 	function updateTimestamps() {
             // Call API to get the latest timestamps for all actions
             fetch('http://192.168.1.32:5001/get_last_timestamps')
@@ -140,7 +187,18 @@
                         var action = timestamps[i].action;
                         var timestamp = timestamps[i].timestamp;
                         var cell = document.getElementById(action.toLowerCase() + 'Timestamp');
-                        cell.textContent = timestamp;
+                        // If it was yesterday, we show the string yesterday instead
+                        var now = new Date();
+                        var date = new Date(timestamp);
+                        lastActionTimestamps[action] = date;
+                        var diffDays = Math.floor((now - date) / (1000 * 60 * 60 * 24));
+                        if (diffDays === 1 && now.getDate() !== date.getDate()) {
+                            cell.textContent = 'Yesterday';
+                        } else if (diffDays > 1) {
+                            cell.textContent = diffDays + " days ago";
+                        } else {
+                            cell.textContent = date.getHours() + ":" + date.getMinutes();
+                        }
                     }
                 })
                 .catch(error => {
@@ -148,11 +206,17 @@
                 });
         }
 
-	// Call updateTimestamps initially
-        updateTimestamps();
+    // Call this function recursively every second
+	setTimeout(updateElapsedTimes, 1000);
 
-        // Call updateTimestamps every 2 minutes
-        setInterval(updateTimestamps, 120000);
+    // Call updateTimestamps initially
+    updateTimestamps();
+
+    // Call the function to start updating the elapsed times
+    updateElapsedTimes();	
+
+    // Call updateTimestamps every 2 minutes
+    setInterval(updateTimestamps, 120000);
     </script>
 </body>
 </html>
