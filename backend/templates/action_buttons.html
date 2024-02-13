@@ -35,7 +35,7 @@
                 <td id="diaper_changeTimestamp">-</td>
                 <td id="bathTimestamp">-</td>
                 <td id="sleepTimestamp">-</td>
-                <td id="washing_diapersTimestampstamp">-</td>
+                <td id="washing_diapersTimestamp">-</td>
             </tr>
             <tr id="timeSinceLastAction">
                 <td>Time elapsed since last action</td>
@@ -156,7 +156,10 @@
 
 	// Object to store the timestamp of the last action for each action type
       var lastActionTimestamps = {
+
       };
+
+      const divmod = (x, y) => [Math.floor(x / y), x % y];
 
       // Function to update the elapsed time since the last action for each action type
       function updateElapsedTimes() {
@@ -166,11 +169,16 @@
         
             // Calculate hours and minutes
             var hours = Math.floor(elapsedTime / (1000 * 60 * 60));
+	        var days_passed = divmod(hours, 24)
             var minutes = Math.floor((elapsedTime % (1000 * 60 * 60)) / (1000 * 60));
         
-            // Format hours and minutes
-            var formattedTime = ("0" + hours).slice(-2) + "hs:" + ("0" + minutes).slice(-2) + "m";
-        
+            if (hours > 24) {
+                var formattedTime = days_passed[0] + " days and " + days_passed[1] + "hs";
+            } else {
+                // Format hours and minutes
+                var formattedTime = ("0" + hours).slice(-2) + "hs:" + ("0" + minutes).slice(-2) + "m";
+            }
+                    
             // Update the elapsed time cell for the current action
             var elapsedTimeCell = document.getElementById(action.toLowerCase() + 'ElapsedTime');
             elapsedTimeCell.textContent = formattedTime;
@@ -197,7 +205,7 @@
                         } else if (diffDays > 1) {
                             cell.textContent = diffDays + " days ago";
                         } else {
-                            cell.textContent = date.getHours() + ":" + date.getMinutes();
+                            cell.textContent = date.getHours() + ":" + ('0'+date.getMinutes()).slice(-2);
                         }
                     }
                 })

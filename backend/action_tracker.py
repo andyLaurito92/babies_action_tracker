@@ -63,9 +63,9 @@ if __name__ == "__main__":
     with app.app_context():
         db.create_all()
         logger.info("Initializing statuses of all actions")
-        if BabyActionStatuses.query.count() == 0:
-            for action in ACTIONS:
+        for action in ACTIONS:
+            if BabyActionStatuses.query.filter_by(action_name=action).count() == 0:
                 db.session.add(BabyActionStatuses(action_name=action, status='ENDED'))
-            db.session.commit()
+                db.session.commit()
        
     app.run(host='0.0.0.0', port=5001)
