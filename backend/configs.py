@@ -24,7 +24,7 @@ logger.addHandler(file_handler_all)
 logger.addHandler(file_handler_error)
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///baby_actions.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = f"sqlite:///{DIRECTORY}/instance/baby_actions.db"
 
 db = SQLAlchemy()
 
