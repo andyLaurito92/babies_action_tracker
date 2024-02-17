@@ -1,7 +1,7 @@
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import text
 
-db = SQLAlchemy()
+from configs import db
 
 class BabyAction(db.Model):
     __tablename__ = 'baby_actions'
