@@ -5,13 +5,6 @@ from configs import logger
 ACTIONS = ("sleep", "eat", "poop", "diaper_change", "bath", "washing_diapers")
 action_repo = ActionRepository()
 
-def initialize_action_controller():
-   logger.info("Initializing statuses of all actions")
-   for action in ACTIONS:
-      if BabyActionStatuses.query.filter_by(action_name=action).count() == 0:
-         db.session.add(BabyActionStatuses(action_name=action, status='ENDED'))
-         db.session.commit()
-            
 def index():
    return render_template('action_buttons.html')
 
