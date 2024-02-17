@@ -7,3 +7,5 @@ build
 dist
 
 .buildozer
+
+backend/logs/all_messages.log
