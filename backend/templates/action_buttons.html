@@ -13,17 +13,19 @@
         <div id="babyDetails"></div>
     </div>
     <div class="container">
-        <button onclick="addAction('eat')">Eat</button>
-        <button onclick="addAction('poop')">Poop</button>
-        <button onclick="addAction('diaper_change')">Diaper Change</button>
-        <button onclick="addAction('bath')">Bath</button>
-        <button onclick="addAction('sleep')">Sleep</button>
-        <button onclick="addAction('washing_diapers')">Washing Diapers</button>
-
         <div id="popup" style="display: none;">
             <p>Action added</p>
         </div>
         <table id="actionTable">
+	  <tr id="timestampsRow">
+                <td></td>
+                <td><button onclick="addAction('eat')">Eat</button></td>
+                <td><button onclick="addAction('poop')">Poop</button></td>
+                <td><button onclick="addAction('diaper_change')">Diaper Change</button></td>
+                <td><button onclick="addAction('bath')">Bath</button></td>
+                <td><button onclick="addAction('sleep')">Sleep</button></td>
+                <td><button onclick="addAction('washing_diapers')">Washing Diapers</button></td>
+            </tr>
             <tr>
                 <th></th>
                 <th>Eat</th>
