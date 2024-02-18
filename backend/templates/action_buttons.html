@@ -6,6 +6,12 @@
     <title>Baby Actions Buttons</title>
 </head>
 <body>
+  <div class="whole">
+    <div class="babyContainer">
+        <h1>Baby Details</h1>
+        <div id="babyDetails">
+	</div>
+    </div>
     <div class="container">
         <button onclick="addAction('eat')">Eat</button>
         <button onclick="addAction('poop')">Poop</button>
@@ -17,7 +23,6 @@
         <div id="popup" style="display: none;">
             <p>Action added</p>
         </div>
-        
         <table id="actionTable">
             <tr>
                 <th></th>
@@ -48,13 +53,40 @@
             </tr>
         </table>
     </div>
-
+  </div>
+    
     <style>
       babyImage {
             display: block;
             margin: 20px auto;
             width: 200px;
         }
+	.babyContainer {
+	    max-width: 600px;
+	    margin: 0 auto;
+	    padding: 20px;
+	    background-color: rgba(255, 255, 255, 0.8);
+	    border-radius: 5px;
+	}
+
+	.babyContainer h1 {
+	    text-align: center;
+	    color: #333;
+	}
+
+	.babyContainer ul {
+	    list-style-type: none;
+	    padding: 0;
+	}
+
+	.babyContainer li {
+	    margin-bottom: 15px;
+	}
+
+	.error {
+	    color: red;
+	    font-weight: bold;
+	}
 
         body {
             font-family: Arial, sans-serif;
@@ -146,6 +178,41 @@
             });
         }
 
+      function getBabies() {
+        fetch('http://192.168.1.32:5001/baby/get_all')
+	  .then(response => response.json())
+	  .then(babies => {
+	    // Create a HTML string to display the baby details
+            let html = '';
+            if (babies.length > 0) {
+                html += '<ul>';
+                // Loop through each baby detail and add it to the HTML
+                babies.forEach(baby => {
+                    // Calculate the baby's age in years and months
+                    const dob = new Date(baby.born_timestamp);
+                    const today = new Date();
+                    const diff = today.getTime() - dob.getTime();
+                    const ageInMonths = Math.floor(diff / (1000 * 60 * 60 * 24 * 30));
+                    const ageInYears = Math.floor(ageInMonths / 12);
+                    const monthsLeft = ageInMonths % 12;
+
+                    html += `<li>Name: ${baby.first_name} ${baby.last_name}</li>`;
+                    html += `<li>Date of Birth: ${baby.born_timestamp}</li>`;
+                    html += `<li>Age: ${ageInYears} years ${monthsLeft} months</li>`;
+                    html += '<hr>';
+                });
+                html += '</ul>';
+            } else {
+                html += '<p class="error">No baby details available.</p>';
+            }
+            // Set the HTML content of the babyDetails div
+            document.getElementById('babyDetails').innerHTML = html;
+	    })
+	    .catch(error => {
+		console.error('There was a problem with the fetch operation:', error);
+	    });
+      }
+      
         function showPopup() {
             var popup = document.getElementById('popup');
             popup.style.display = 'block';
@@ -213,6 +280,8 @@
                     console.error('There was a problem with the fetch operation:', error);
                 });
         }
+
+    getBabies()
 
     // Call this function recursively every second
 	setTimeout(updateElapsedTimes, 1000);
