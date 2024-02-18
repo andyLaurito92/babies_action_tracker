@@ -9,8 +9,8 @@
   <div class="whole">
     <div class="babyContainer">
         <h1>Baby Details</h1>
-        <div id="babyDetails">
-	</div>
+	<img src="https://raw.githubusercontent.com/andyLaurito92/babies_action_tracker/main/backend/templates/images/amelia_leyendo.jpeg" alt="Amelia Reading" class="babyImage">
+        <div id="babyDetails"></div>
     </div>
     <div class="container">
         <button onclick="addAction('eat')">Eat</button>
@@ -67,6 +67,13 @@
 	    padding: 20px;
 	    background-color: rgba(255, 255, 255, 0.8);
 	    border-radius: 5px;
+            overflow: hidden; 
+            text-align: right; 
+	}
+
+	.babyContainer img {
+	    height: auto;
+	    max-width: 300px;
 	}
 
 	.babyContainer h1 {
