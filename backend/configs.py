@@ -1,8 +1,9 @@
 import logging
+import os
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 
-DIRECTORY = "/Users/andreslaurito/repos/babies_action_tracker/backend"
+DIRECTORY = os.getcwd()
 
 # create a logger
 logger = logging.getLogger()
