@@ -158,10 +158,11 @@
     </style>
 
     <script>
+      var localhost = location.host;
         function addAction(action) {
 	    var tzoffset = (new Date()).getTimezoneOffset() * 60000; //offset in milliseconds
 	    var timestamp = (new Date(Date.now() - tzoffset)).toISOString().slice(0, -1);
-            fetch('http://192.168.1.32:5001/add_action', {
+            fetch('http://'+localhost+'/add_action', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -188,7 +189,7 @@
         }
 
       function getBabies() {
-        fetch('http://192.168.1.32:5001/baby/get_all')
+        fetch('http://'+localhost+'/baby/get_all')
 	  .then(response => response.json())
 	  .then(babies => {
 	    // Create a HTML string to display the baby details
@@ -263,7 +264,7 @@
 
 	function updateTimestamps() {
             // Call API to get the latest timestamps for all actions
-            fetch('http://192.168.1.32:5001/get_last_timestamps')
+            fetch('http://'+localhost+'/get_last_timestamps')
                 .then(response => response.json())
                 .then(data => {
                     var timestamps = data.timestamps;
