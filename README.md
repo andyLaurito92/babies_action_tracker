@@ -1,7 +1,7 @@
 # Babies Action Tracker
 Small project to have traceability on actions that a baby does :)
 
-#https://github.com/andyLaurito92/babies_action_tracker/tree/main# How to run this project
+# How to run this project
 
 *Pre-requirement*: You have created a conda environment in your machine by using the yml generated with condas (by running `conda env export > babies_action_tracker.yml`
 
